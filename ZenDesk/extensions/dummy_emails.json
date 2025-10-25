@@ -1,0 +1,8 @@
+{
+  "emails": [
+    {"id": 1, "from": "team@work.com", "subject": "Standup notes", "body": "Today's standup moved to 10am. Please update your progress.", "label": "work", "unread": true},
+    {"id": 2, "from": "news@newsletter.com", "subject": "Weekly Digest", "body": "Your weekly newsletter with plenty of links and promotions.", "label": "newsletter", "unread": true},
+    {"id": 3, "from": "friend@mail.com", "subject": "Lunch?", "body": "Wanna grab lunch later? I'm free at 12:30.", "label": "personal", "unread": true},
+    {"id": 4, "from": "alerts@bank.com", "subject": "Payment Reminder", "body": "Your bill of $45 is due tomorrow.", "label": "alert", "unread": false}
+  ]
+}

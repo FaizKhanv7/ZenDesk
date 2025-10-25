@@ -1,0 +1,7 @@
+body { font-family: Arial, sans-serif; width: 320px; margin: 0; padding: 12px; background: #0f1724; color: #e6eef8; }
+.container { display: flex; flex-direction: column; gap: 10px; }
+h2 { margin: 0; color: #7ee787; }
+.buttons { display:flex; gap:8px; flex-wrap:wrap; }
+button { flex:1; padding:8px; border-radius:6px; border: none; cursor:pointer; background:#111827; color:#e6eef8; }
+#results { margin-top:10px; background:#0b1220; padding:8px; border-radius:6px; max-height:200px; overflow:auto; }
+a { color:#9fbfff; text-decoration:none; font-size:12px; }

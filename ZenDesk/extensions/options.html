@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>ZenDesk Options</title>
+  <style>
+    body{font-family:Arial;padding:12px;background:#0f1724;color:#e6eef8}
+    input,button{padding:8px;margin:6px 0;border-radius:6px;border:none}
+  </style>
+</head>
+<body>
+  <h2>QuickText Shortcuts</h2>
+  <div>
+    <label>Shortcut (e.g. /email):</label><br/>
+    <input id="shortcut" placeholder="/email" />
+    <br/><label>Expansion:</label><br/>
+    <input id="expansion" placeholder="you@example.com" />
+    <br/>
+    <button id="add">Add / Update</button>
+  </div>
+  <h3>Existing</h3>
+  <ul id="list"></ul>
+
+  <script src="options.js"></script>
+</body>
+</html>
