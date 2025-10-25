@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --accent: #6c9ef8;
+  --accent-glow: 0 0 14px rgba(108, 158, 248, 0.6);
+  --text: #e9eefc;
+  --muted: #a0a9c0;
+  --radius: 14px;
+  --transition: 0.3s ease;
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text);
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+
+.options-container {
+  background: var(--glass-bg);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 400px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h1 {
+  font-size: 22px;
+  margin-bottom: 6px;
+  text-shadow: var(--accent-glow);
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.new-shortcut {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  margin-top: 20px;
+}
+
+input[type="text"] {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text);
+  padding: 10px;
+  border-radius: var(--radius);
+  width: 100%;
+  outline: none;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+input[type="text"]:focus {
+  border-color: var(--accent);
+  box-shadow: var(--accent-glow);
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+}
+
+.btn:hover {
+  box-shadow: var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.shortcut-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--glass-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.shortcut-item span {
+  color: var(--text);
+}
+
+.shortcut-item button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: var(--transition);
+}
+
+.shortcut-item button:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.save-tip {
+  background: rgba(108, 158, 248, 0.15);
+  border-radius: var(--radius);
+  padding: 10px;
+  font-size: 13px;
+  margin-top: 15px;
+  border: 1px solid rgba(108, 158, 248, 0.4);
+  color: var(--text);
+  animation: fadeIn 0.5s ease;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ZenDesk</title>
   <link rel="stylesheet" href="popup.css" />
+  <style>
+    body {
+      transition: background-color 0.3s ease;
+    }
+    .btn.focus {
+      background-color: #f44336;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    .btn.focus.active {
+      background-color: #4caf50;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -14,19 +27,30 @@
     </header>
 
     <main class="main">
-      <div id="focus-score" class="focus-card">Focus Score: —</div>
 
-      <!-- FOCUS MODE TIMER -->
-      <div id="focus-timer" class="focus-card" style="margin-top: 10px; font-weight: bold;">
-        Focus Mode: Off
-      </div>
 
       <div class="btn-group buttons">
+        <!-- Custom Blocked Sites -->
+        <div class="focus-card blocked-site-section">
+          <h3>🚫 Custom Blocked Websites</h3>
+
+          <!-- Transparent centered input -->
+          <div class="blocked-site-input">
+            <input id="block-input" type="text" placeholder="Enter site (e.g. youtube.com)" />
+          </div>
+
+          <!-- Centered Add button in its own div -->
+          <div class="add-btn-container">
+            <button id="add-block" class="btn small">Add</button>
+          </div>
+
+          <!-- Blocked list -->
+          <ul id="blocked-list" class="blocked-list"></ul>
+        </div>
         <button id="summarize" class="btn primary">📬 Summarize Inbox</button>
         <button id="analyze-tabs" class="btn">🧹 Declutter Tabs</button>
-        <!-- Updated: Separate activate/deactivate buttons for clarity -->
-        <button id="activate" class="btn focus">🎯 Activate Focus Mode</button>
-        <button id="deactivate" class="btn focus" style="background-color: #f44336; color: white;">🛑 Deactivate Focus Mode</button>
+        <!-- Single Focus Mode Toggle -->
+        <button id="focus-toggle" class="btn focus">🎯 Activate Focus Mode</button>
       </div>
 
       <div id="results" class="results"></div>

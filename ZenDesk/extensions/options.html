@@ -1,21 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Edit QuickText Shortcuts</title>
-  <link rel="stylesheet" href="popup.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Edit Shortcuts — ZenDesk</title>
+  <link rel="stylesheet" href="options.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="options-container">
     <h1>⚙️ QuickText Shortcuts</h1>
+    <p class="subtitle">Create or edit text shortcuts for faster input.</p>
 
-    <form id="shortcut-form">
-      <input id="key" placeholder="/shortcut" required>
-      <input id="value" placeholder="Replacement text" required>
-      <button type="submit" class="btn primary">Save Shortcut</button>
-    </form>
+    <div id="shortcuts-list"></div>
 
-    <ul id="shortcut-list"></ul>
+    <div class="new-shortcut">
+      <input id="shortcut-key" type="text" placeholder="Shortcut (e.g. /email)" />
+      <input id="shortcut-value" type="text" placeholder="Replacement text" />
+      <button id="add-shortcut" class="btn primary">Add Shortcut</button>
+    </div>
+
+    <div id="save-tip" class="save-tip hidden">
+      💡 Shortcuts only work on input boxes. Please refresh the page where you want them to work.
+    </div>
   </div>
 
   <script src="options.js"></script>

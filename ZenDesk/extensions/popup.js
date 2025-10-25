@@ -1,13 +1,11 @@
 // ===============================
-// popup.js: ZenDesk
+// popup.js: ZenDesk (Simplified Toggle Edition)
 // ===============================
 
 const summarizeBtn = document.getElementById("summarize");
 const analyzeTabsBtn = document.getElementById("analyze-tabs");
-const activateBtn = document.getElementById("activate");
-const deactivateBtn = document.getElementById("deactivate");
+const focusToggleBtn = document.getElementById("focus-toggle");
 const results = document.getElementById("results");
-const focusScoreEl = document.getElementById("focus-score");
 const focusTimerEl = document.getElementById("focus-timer");
 
 // ------------------------------
@@ -33,10 +31,9 @@ function summarizeEmails(emails) {
     acc[e.label] = (acc[e.label] || 0) + 1;
     return acc;
   }, {});
-  let tldrParts = [];
-  for (const [k, v] of Object.entries(counts)) tldrParts.push(`${v} ${k}`);
+  const tldrParts = Object.entries(counts).map(([k, v]) => `${v} ${k}`);
   const tldr = `${unread.length} new emails: ${tldrParts.join(", ")}`;
-  const subjects = unread.map(s => s.subject).slice(0,5).join(" • ");
+  const subjects = unread.map(s => s.subject).slice(0, 5).join(" • ");
   return { tldr, subjects, unread };
 }
 
@@ -48,68 +45,81 @@ async function updateFocusScore() {
   const emails = await loadDummyEmails();
   const unread = emails.filter(e => e.unread).length;
   let score = Math.max(10, 100 - (tabs.length * 5) - (unread * 8));
-  focusScoreEl.textContent = `Focus Score: ${score}`;
+  console.log(`Focus Score: ${score}`);
+}
+
+
+// ------------------------------
+// Focus Mode Toggle
+// ------------------------------
+focusToggleBtn.addEventListener("click", async () => {
+  const { focusMode } = await chrome.storage.local.get({ focusMode: false });
+
+  if (!focusMode) {
+    chrome.runtime.sendMessage({ action: "activateFocusMode", interval: 30 * 60 * 1000 }, (r) => {
+      if (r?.ok) {
+        showResult("<b>Focus Mode Activated</b> — closing distracting tabs.");
+        updateFocusButton(true);
+        updateFocusScore();
+      }
+    });
+  } else {
+    chrome.runtime.sendMessage({ action: "deactivateFocusMode" }, (r) => {
+      if (r?.ok) {
+        showResult("<b>Focus Mode Deactivated</b>");
+        updateFocusButton(false);
+        updateFocusScore();
+      }
+    });
+  }
+});
+
+function updateFocusButton(isActive) {
+  if (isActive) {
+    focusToggleBtn.classList.add("active");
+    focusToggleBtn.textContent = "🛑 Deactivate Focus Mode";
+    document.body.style.backgroundColor = "#d4f7d0"; // green background
+  } else {
+    focusToggleBtn.classList.remove("active");
+    focusToggleBtn.textContent = "🎯 Activate Focus Mode";
+    document.body.style.backgroundColor = "#ffd6d6"; // red background
+  }
 }
 
 // ------------------------------
-// Update Focus Mode countdown
+// Sync button state on popup open
 // ------------------------------
-function updateFocusTime() {
-  chrome.storage.local.get(['focusMode', 'focusEndTime'], ({ focusMode, focusEndTime }) => {
-    if (!focusMode || !focusEndTime) {
-      focusTimerEl.textContent = 'Focus Mode: Off';
-      return;
-    }
-    const timeLeft = Math.max(0, focusEndTime - Date.now());
-    const minutes = Math.floor(timeLeft / 60000);
-    const seconds = Math.floor((timeLeft % 60000) / 1000);
-    focusTimerEl.textContent = `Focus Mode: ${minutes}:${seconds.toString().padStart(2, '0')} left`;
-
-    // Auto-deactivate if time is up
-    if (timeLeft <= 0) {
-      focusTimerEl.textContent = 'Focus Mode: Off';
-      chrome.runtime.sendMessage({ action: 'deactivateFocusMode' });
-    }
-  });
-}
-setInterval(updateFocusTime, 1000);
-updateFocusTime();
+chrome.storage.local.get(["focusMode"], ({ focusMode }) => {
+  updateFocusButton(focusMode);
+});
 
 // ------------------------------
-// Button event listeners
+// Summarize Inbox
 // ------------------------------
-
-// Summarize inbox
 summarizeBtn.addEventListener("click", async () => {
   const emails = await loadDummyEmails();
   const s = summarizeEmails(emails);
   showResult(`<b>TL;DR:</b> ${s.tldr}<br/><i>${s.subjects}</i> <br/><button id="mark-news">Mark newsletters read</button>`);
 
   document.getElementById("mark-news").addEventListener("click", () => {
-    const updated = emails.map(e => e.label === "newsletter" ? {...e, unread:false} : e);
+    const updated = emails.map(e => e.label === "newsletter" ? { ...e, unread: false } : e);
     showResult(`<b>Marked newsletters read (demo)</b>`);
     updateFocusScore();
   });
   updateFocusScore();
 });
 
-// Declutter tabs / analyze
-// Declutter tabs / analyze and group
+// ------------------------------
+// Declutter Tabs
+// ------------------------------
 analyzeTabsBtn.addEventListener("click", async () => {
   const tabs = await chrome.tabs.query({ currentWindow: true });
 
-  const groups = {
-    work: [],
-    learn: [],
-    distract: [],
-    other: []
-  };
-
+  const groups = { work: [], learn: [], distract: [], other: [] };
   const workSites = ["notion", "docs.google", "drive.google", "slack", "calendar.google", "figma"];
   const learnSites = ["youtube", "coursera", "edx", "khanacademy", "medium", "wikipedia"];
   const distractSites = ["reddit", "twitter", "x.com", "instagram", "tiktok", "netflix", "discord"];
 
-  // Categorize each tab by URL
   for (const tab of tabs) {
     const url = tab.url || "";
     if (workSites.some(s => url.includes(s))) groups.work.push(tab.id);
@@ -118,14 +128,12 @@ analyzeTabsBtn.addEventListener("click", async () => {
     else groups.other.push(tab.id);
   }
 
-  // Function to create a tab group
   async function createGroup(tabIds, color, title) {
     if (tabIds.length === 0) return;
     const groupId = await chrome.tabs.group({ tabIds });
     await chrome.tabGroups.update(groupId, { color, title });
   }
 
-  // Actually make the groups
   await createGroup(groups.work, "blue", "Work");
   await createGroup(groups.learn, "green", "Learning");
   await createGroup(groups.distract, "red", "Distractions");
@@ -142,21 +150,49 @@ analyzeTabsBtn.addEventListener("click", async () => {
   updateFocusScore();
 });
 
+// ------------------------------
+// Custom Blocked Websites
+// ------------------------------
+function loadBlockedSites() {
+  chrome.storage.local.get(["blockedSites"], (res) => {
+    const list = res.blockedSites || [];
+    const ul = document.getElementById("blocked-list");
+    ul.innerHTML = "";
 
-// ------------------------------
-// Focus Mode buttons
-// ------------------------------
-activateBtn.addEventListener("click", () => {
-  chrome.runtime.sendMessage({ action: "activateFocusMode", interval: 30 * 60 * 1000 }, (r) => {
-    showResult("<b>Focus Mode Activated</b> — closing distracting tabs.");
-    updateFocusScore();
+    list.forEach((site, index) => {
+      const li = document.createElement("li");
+      li.textContent = site;
+      li.style.marginBottom = "5px";
+
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "Remove";
+      removeBtn.className = "btn small";
+      removeBtn.style.marginLeft = "10px";
+      removeBtn.addEventListener("click", () => {
+        list.splice(index, 1);
+        chrome.storage.local.set({ blockedSites: list }, loadBlockedSites);
+      });
+
+      li.appendChild(removeBtn);
+      ul.appendChild(li);
+    });
   });
-});
+}
 
-deactivateBtn.addEventListener("click", () => {
-  chrome.runtime.sendMessage({ action: "deactivateFocusMode" }, (r) => {
-    showResult("<b>Focus Mode Deactivated</b>");
-    updateFocusScore();
+document.getElementById("add-block").addEventListener("click", () => {
+  const input = document.getElementById("block-input");
+  const newSite = input.value.trim();
+  if (!newSite) return;
+
+  chrome.storage.local.get(["blockedSites"], (res) => {
+    const list = res.blockedSites || [];
+    if (!list.includes(newSite)) {
+      list.push(newSite);
+      chrome.storage.local.set({ blockedSites: list }, () => {
+        input.value = "";
+        loadBlockedSites();
+      });
+    }
   });
 });
 
@@ -164,5 +200,4 @@ deactivateBtn.addEventListener("click", () => {
 // Initial load
 // ------------------------------
 updateFocusScore();
-updateFocusTime();
-
+loadBlockedSites();
