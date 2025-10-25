@@ -1,43 +1,59 @@
-// options.js
-const shortcutEl = document.getElementById("shortcut");
-const expansionEl = document.getElementById("expansion");
-const addBtn = document.getElementById("add");
-const listEl = document.getElementById("list");
+// options.js — Manage QuickText shortcuts
 
-function refresh() {
-  chrome.storage.local.get(["shortcuts"], (res) => {
-    const sc = res.shortcuts || {};
-    listEl.innerHTML = "";
-    Object.entries(sc).forEach(([k,v]) => {
-      const li = document.createElement("li");
-      li.innerHTML = `${k} → ${v} <button data-key="${k}">Delete</button>`;
-      listEl.appendChild(li);
-    });
-    document.querySelectorAll("button[data-key]").forEach(b => {
-      b.addEventListener("click", (e) => {
-        const key = e.target.dataset.key;
-        chrome.storage.local.get(["shortcuts"], (r) => {
-          const s = r.shortcuts || {};
-          delete s[key];
-          chrome.storage.local.set({ shortcuts: s }, refresh);
-        });
-      });
+const form = document.getElementById('shortcut-form');
+const keyInput = document.getElementById('key');
+const valueInput = document.getElementById('value');
+const list = document.getElementById('shortcut-list');
+
+// Load and display shortcuts
+function loadShortcuts() {
+  chrome.storage.sync.get({ quicktext: {} }, (data) => {
+    const shortcuts = data.quicktext;
+    list.innerHTML = '';
+
+    for (const [key, val] of Object.entries(shortcuts)) {
+      const li = document.createElement('li');
+      li.innerHTML = `<b>${key}</b>: ${val} 
+        <button class="delete-btn" data-key="${key}">❌</button>`;
+      list.appendChild(li);
+    }
+
+    // Hook up delete buttons
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteShortcut(btn.dataset.key));
     });
   });
 }
 
-addBtn.addEventListener("click", () => {
-  const key = shortcutEl.value.trim();
-  const val = expansionEl.value.trim();
-  if (!key || !val) return alert("Provide both fields");
-  chrome.storage.local.get(["shortcuts"], (res) => {
-    const sc = res.shortcuts || {};
-    sc[key] = val;
-    chrome.storage.local.set({ shortcuts: sc }, () => {
-      shortcutEl.value = ""; expansionEl.value = "";
-      refresh();
+// Add or update shortcut
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const key = keyInput.value.trim();
+  const val = valueInput.value.trim();
+
+  if (!key.startsWith('/')) {
+    alert('Shortcut must start with "/"');
+    return;
+  }
+
+  chrome.storage.sync.get({ quicktext: {} }, (data) => {
+    const shortcuts = data.quicktext;
+    shortcuts[key] = val;
+    chrome.storage.sync.set({ quicktext: shortcuts }, () => {
+      keyInput.value = '';
+      valueInput.value = '';
+      loadShortcuts();
     });
   });
 });
 
-refresh();
+// Delete shortcut
+function deleteShortcut(key) {
+  chrome.storage.sync.get({ quicktext: {} }, (data) => {
+    const shortcuts = data.quicktext;
+    delete shortcuts[key];
+    chrome.storage.sync.set({ quicktext: shortcuts }, loadShortcuts);
+  });
+}
+
+loadShortcuts();

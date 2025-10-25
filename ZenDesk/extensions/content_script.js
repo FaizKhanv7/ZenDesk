@@ -1,38 +1,52 @@
 // content_script.js
-// Listen for input events and replace shortcodes like /email with saved text from chrome.storage
-// This is a simple approach: on input blur or space it checks for shortcode at the end.
+// Replace shortcodes like /email or /addr with user-defined text stored in chrome.storage.sync
 
 function replaceShortcodesInElement(el, shortcuts) {
-  // Only text inputs and textareas
   if (!(el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el.isContentEditable)) return;
+
   const val = el.value || el.innerText;
   if (!val) return;
+
   const tokens = val.split(/\s/);
   const last = tokens[tokens.length - 1];
+
   if (shortcuts[last]) {
     tokens[tokens.length - 1] = shortcuts[last];
     const newVal = tokens.join(" ");
+
     if (el.value !== undefined) el.value = newVal;
     else el.innerText = newVal;
-    // trigger events so page knows value changed
-    el.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Trigger input event so site reacts to new value
+    el.dispatchEvent(new Event("input", { bubbles: true }));
   }
 }
 
-// Load shortcuts and attach input listeners
-chrome.storage.local.get(["shortcuts"], (res) => {
-  const shortcuts = res.shortcuts || { "/email": "you@example.com", "/addr": "123 Main Street" };
+// --- live shortcut sync ---
+let shortcuts = {};
 
-  document.addEventListener("keydown", (e) => {
-    // Check for space or enter to trigger replace
-    if (e.key === " " || e.key === "Enter") {
-      const el = document.activeElement;
-      replaceShortcodesInElement(el, shortcuts);
-    }
-  });
+// Load from chrome.storage.sync (shared with options.html)
+chrome.storage.sync.get({ quicktext: { "/email": "you@example.com", "/addr": "123 Main Street" } }, (res) => {
+  shortcuts = res.quicktext;
+});
 
-  // Also handle blur (user leaves input)
-  document.addEventListener("focusout", (e) => {
-    replaceShortcodesInElement(e.target, shortcuts);
-  });
+// Update shortcuts when changed
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "sync" && changes.quicktext) {
+    shortcuts = changes.quicktext.newValue || {};
+    console.log("QuickText updated:", shortcuts);
+  }
+});
+
+// Replace on space or enter
+document.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.key === "Enter") {
+    const el = document.activeElement;
+    replaceShortcodesInElement(el, shortcuts);
+  }
+});
+
+// Replace on blur (when leaving input)
+document.addEventListener("focusout", (e) => {
+  replaceShortcodesInElement(e.target, shortcuts);
 });
