@@ -1,40 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
- <head>
-   <meta charset="utf-8" />
-   <meta name="viewport" content="width=device-width,initial-scale=1" />
-   <title>ZenDesk</title>
-   <link rel="stylesheet" href="popup.css" />
- </head>
- <body>
-   <div class="container">
-     <header class="header">
-       <h1 class="title">ZenDesk</h1>
-       <p class="tagline">Your Desk, but Digital Zen.</p>
-     </header>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ZenDesk</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">ZenDesk</h1>
+      <p class="tagline">Your Desk, but Digital Zen.</p>
+    </header>
 
+    <main class="main">
+      <div id="focus-score" class="focus-card">Focus Score: —</div>
 
-     <main class="main">
-       <div id="focus-score" class="focus-card">Focus Score: —</div>
+      <!-- FOCUS MODE TIMER -->
+      <div id="focus-timer" class="focus-card" style="margin-top: 10px; font-weight: bold;">
+        Focus Mode: Off
+      </div>
 
+      <div class="btn-group buttons">
+        <button id="summarize" class="btn primary">📬 Summarize Inbox</button>
+        <button id="analyze-tabs" class="btn">🧹 Declutter Tabs</button>
+        <!-- Updated: Separate activate/deactivate buttons for clarity -->
+        <button id="activate" class="btn focus">🎯 Activate Focus Mode</button>
+        <button id="deactivate" class="btn focus" style="background-color: #f44336; color: white;">🛑 Deactivate Focus Mode</button>
+      </div>
 
-       <div class="btn-group buttons">
-         <button id="summarize" class="btn primary">📬 Summarize Inbox</button>
-         <button id="analyze-tabs" class="btn">🧹 Declutter Tabs</button>
-         <button id="focus-mode" class="btn focus">🎯 Activate Focus Mode</button>
-       </div>
+      <div id="results" class="results"></div>
+    </main>
 
+    <footer class="footer">
+      <a href="options.html" target="_blank" class="link">⚙️ Edit QuickText Shortcuts</a>
+    </footer>
+  </div>
 
-       <div id="results" class="results"></div>
-     </main>
-
-
-     <footer class="footer">
-       <a href="options.html" target="_blank" class="link">⚙️ Edit QuickText Shortcuts</a>
-     </footer>
-   </div>
-
-
-   <script src="popup.js"></script>
- </body>
+  <script src="popup.js"></script>
+</body>
 </html>
